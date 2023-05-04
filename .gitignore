@@ -1,2 +1,5 @@
 # Project exclude paths
-/target/
+target/
+.idea/
+src/test/java/day*/
+src/test/resources/adblock/
