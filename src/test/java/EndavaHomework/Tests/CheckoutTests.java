@@ -23,7 +23,7 @@ public class CheckoutTests {
 
     @AfterAll
     public static void tearDown() {
-//        sut.close();
+        sut.close();
     }
 
     @BeforeEach
@@ -43,7 +43,7 @@ public class CheckoutTests {
         sutCheckoutPage.fillBillingDetailsForCountryWithOptionalCounty();
         assertTrue(sutCheckoutPage.isStateInputDisplayed());
         assertTrue(sutCheckoutPage.isPostcodeInputDisplayed());
-        var sutOrderReceivedPage = sutCheckoutPage.clickPlaceOrderButton();
+        var sutOrderReceivedPage = sutCheckoutPage.clickPlaceOrderButton(true, true);
 
         // Then
         assertTrue(sutOrderReceivedPage.getCurrentUrl().contains(sut.getConfigProperty(ConfigProperties.PageUrls.ORDER_RECEIVED_URL)));
@@ -61,7 +61,7 @@ public class CheckoutTests {
         sutCheckoutPage.fillBillingDetailsForCountryWithoutPostcodeInput();
         assertTrue(sutCheckoutPage.isStateInputDisplayed());
         assertFalse(sutCheckoutPage.isPostcodeInputDisplayed());
-        var sutOrderReceivedPage = sutCheckoutPage.clickPlaceOrderButton();
+        var sutOrderReceivedPage = sutCheckoutPage.clickPlaceOrderButton(true, true);
 
         // Then
         assertTrue(sutOrderReceivedPage.getCurrentUrl().contains(sut.getConfigProperty(ConfigProperties.PageUrls.ORDER_RECEIVED_URL)));
@@ -78,7 +78,7 @@ public class CheckoutTests {
         // When
         sutCheckoutPage.fillBillingDetailsForCountryWithRequiredStateAsInput();
         assertTrue(sutCheckoutPage.isStateInputDisplayed());
-        var sutOrderReceivedPage = sutCheckoutPage.clickPlaceOrderButton();
+        var sutOrderReceivedPage = sutCheckoutPage.clickPlaceOrderButton(true, true);
 
         // Then
         assertTrue(sutOrderReceivedPage.getCurrentUrl().contains(sut.getConfigProperty(ConfigProperties.PageUrls.ORDER_RECEIVED_URL)));
@@ -93,7 +93,7 @@ public class CheckoutTests {
         var sutCheckoutPage = sutBasketPage.clickProceedToCheckoutButton();
 
         // When
-        var sutOrderReceivedPage = sutCheckoutPage.clickPlaceOrderButton();
+        var sutOrderReceivedPage = sutCheckoutPage.clickPlaceOrderButton(false, false);
 
         // Then
         assertTrue(sutCheckoutPage.isFlashErrorsListDisplayed());

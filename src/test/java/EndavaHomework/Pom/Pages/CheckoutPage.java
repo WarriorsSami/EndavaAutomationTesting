@@ -2,12 +2,9 @@ package EndavaHomework.Pom.Pages;
 
 import EndavaHomework.Pom.ConfigProperties;
 import org.openqa.selenium.By;
-import org.openqa.selenium.StaleElementReferenceException;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
-import org.openqa.selenium.support.ui.WebDriverWait;
-
-import java.time.Duration;
+import org.openqa.selenium.support.ui.ExpectedConditions;
 
 public class CheckoutPage extends BasePage {
     private final By firstNameInputLocator = By.id("billing_first_name");
@@ -19,12 +16,9 @@ public class CheckoutPage extends BasePage {
     private final By countryResultListLocator = By.id("select2-results-1");
     private final By addressInputLocator = By.id("billing_address_1");
     private final By cityInputLocator = By.id("billing_city");
-    private final By stateSelectLocator = By.xpath("//*[@id=\"s2id_billing_state\"]/a");
-    private final By stateSelectInputLocator = By.xpath("//*[@id=\"select2-drop\"]/div/input");
-    private final By stateResultListLocator = By.xpath("//*[@id=\"select2-drop\"]/ul");
     private final By stateInputLocator = By.xpath("//*[@id=\"billing_state\"]");
     private final By postcodeInputLocator = By.id("billing_postcode");
-    private final By cashOnDeliveryRadioButtonLocator = By.xpath("//*[@id=\"payment\"]/ul/li[3]");
+    private final By cashOnDeliveryRadioButtonLocator = By.xpath("//*[@id=\"payment\"]/ul/li[3]/label");
     private final By placeOrderButtonLocator = By.id("place_order");
     private final By flashErrorsListLocator = By.xpath("//*[@id=\"page-35\"]/div/div[1]/form[3]/ul");
 
@@ -48,12 +42,6 @@ public class CheckoutPage extends BasePage {
         driver.findElement(phoneInputLocator).sendKeys(getConfigProperty(ConfigProperties.BillingDetails.PHONE));
     }
 
-    public void selectStateAsSelectListItem() {
-        driver.findElement(stateSelectLocator).click();
-        driver.findElement(stateSelectInputLocator).sendKeys(getConfigProperty(ConfigProperties.BillingDetails.STATE_ALABAMA));
-        driver.findElement(stateResultListLocator).findElements(By.xpath("./li")).get(0).click();
-    }
-
     public void selectStateAsInput() {
         driver.findElement(stateInputLocator).sendKeys(getConfigProperty(ConfigProperties.BillingDetails.COUNTY_AMERICAN_SAMOA));
     }
@@ -62,14 +50,6 @@ public class CheckoutPage extends BasePage {
         driver.findElement(countrySelectLocator).click();
         driver.findElement(countryInputLocator).sendKeys(getConfigProperty(ConfigProperties.BillingDetails.COUNTRY_ROMANIA));
         driver.findElement(countryResultListLocator).findElements(By.xpath("./li")).get(0).click();
-    }
-
-    public void selectCountryWithRequiredStateAsSelectListItem() {
-        driver.findElement(countrySelectLocator).click();
-        driver.findElement(countryInputLocator).sendKeys(getConfigProperty(ConfigProperties.BillingDetails.COUNTRY_UNITED_STATES));
-        driver.findElement(countryResultListLocator).findElements(By.xpath("./li")).get(0).click();
-
-        selectStateAsSelectListItem();
     }
 
     public void selectCountryWithRequiredStateAsInput() {
@@ -113,6 +93,7 @@ public class CheckoutPage extends BasePage {
     }
 
     public int getFlashErrorsListSize() {
+        fluentWait.until(driver -> driver.findElement(flashErrorsListLocator).findElements(By.xpath("./li")).size() > 0);
         return driver.findElement(flashErrorsListLocator).findElements(By.xpath("./li")).size();
     }
 
@@ -126,11 +107,9 @@ public class CheckoutPage extends BasePage {
     }
 
     public void clickCashOnDeliveryRadioButton() {
-        try {
-            driver.findElement(cashOnDeliveryRadioButtonLocator).click();
-        } catch (StaleElementReferenceException e) {
-            driver.findElement(cashOnDeliveryRadioButtonLocator).click();
-        }
+        fluentWait.until(ExpectedConditions.elementToBeClickable(cashOnDeliveryRadioButtonLocator));
+        fluentWait.until(ExpectedConditions.stalenessOf(driver.findElement(cashOnDeliveryRadioButtonLocator)));
+        driver.findElement(cashOnDeliveryRadioButtonLocator).click();
     }
 
     public void fillBillingDetailsForCountryWithOptionalCounty() {
@@ -139,18 +118,6 @@ public class CheckoutPage extends BasePage {
         fillEmailAddressInput();
         fillPhoneInput();
         selectCountryWithOptionalCounty();
-        fillAddressInput();
-        fillCityInput();
-        fillPostcodeInput();
-        clickCashOnDeliveryRadioButton();
-    }
-
-    public void fillBillingDetailsForCountryWithRequiredStateAsSelectListItem() {
-        fillFirstNameInput();
-        fillLastNameInput();
-        fillEmailAddressInput();
-        fillPhoneInput();
-        selectCountryWithRequiredStateAsSelectListItem();
         fillAddressInput();
         fillCityInput();
         fillPostcodeInput();
@@ -179,10 +146,16 @@ public class CheckoutPage extends BasePage {
         clickCashOnDeliveryRadioButton();
     }
 
-    public OrderReceivedPage clickPlaceOrderButton() {
+    public OrderReceivedPage clickPlaceOrderButton(boolean shouldWaitForRedirectToOrderReceivedPage, boolean orderDataHasBeenModified) {
+        fluentWait.until(ExpectedConditions.elementToBeClickable(placeOrderButtonLocator));
+        if (orderDataHasBeenModified) {
+            fluentWait.until(ExpectedConditions.stalenessOf(driver.findElement(placeOrderButtonLocator)));
+        }
         driver.findElement(placeOrderButtonLocator).click();
-        var wait = new WebDriverWait(driver, Duration.ofSeconds(10));
-        wait.until(d -> d.findElement(By.xpath("//*[@id=\"page-35\"]/div/div[1]/h2")) != null);
+
+        if (shouldWaitForRedirectToOrderReceivedPage) {
+            fluentWait.until(driver -> driver.getCurrentUrl().contains("order-received"));
+        }
 
         return new OrderReceivedPage(driver);
     }

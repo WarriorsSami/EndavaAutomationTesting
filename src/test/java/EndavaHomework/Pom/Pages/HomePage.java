@@ -3,6 +3,7 @@ package EndavaHomework.Pom.Pages;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
+import org.openqa.selenium.support.ui.ExpectedConditions;
 
 public class HomePage extends BasePage {
     private final By newArrivalsLocator = By
@@ -22,7 +23,7 @@ public class HomePage extends BasePage {
     }
 
     public ShopPage clickMenuShopButton() {
-        // implicitly wait for the shop menu button to be clickable
+        fluentWait.until(ExpectedConditions.elementToBeClickable(shopMenuButtonLocator));
         WebElement shopButton = driver.findElement(shopMenuButtonLocator);
         shopButton.click();
 

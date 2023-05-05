@@ -14,14 +14,9 @@ public class ShopPage extends BasePage {
     }
 
     public void selectOrderBy(String orderBy) {
-        try {
-            var selectOrderBy = new Select(driver.findElement(orderBySelectLocator));
-            selectOrderBy.selectByValue(orderBy);
-        } catch (Exception e) {
-            skipAds();
-            var selectOrderBy = new Select(driver.findElement(orderBySelectLocator));
-            selectOrderBy.selectByValue(orderBy);
-        }
+        fluentWait.until(driver -> driver.findElement(orderBySelectLocator).isDisplayed());
+        var selectOrderBy = new Select(driver.findElement(orderBySelectLocator));
+        selectOrderBy.selectByValue(orderBy);
     }
 
     public WebElement getProductListItemByPosition(int position) {
@@ -33,14 +28,9 @@ public class ShopPage extends BasePage {
     }
 
     public ProductPage clickProductListItemByPosition(int position) {
-        try {
-            WebElement productListItem = getProductListItemByPosition(position);
-            productListItem.click();
-        } catch (Exception e) {
-            skipAds();
-            WebElement productListItem = getProductListItemByPosition(position);
-            productListItem.click();
-        }
+        fluentWait.until(driver -> getProductListItemByPosition(position).isDisplayed());
+        WebElement productListItem = getProductListItemByPosition(position);
+        productListItem.click();
 
         return new ProductPage(driver);
     }

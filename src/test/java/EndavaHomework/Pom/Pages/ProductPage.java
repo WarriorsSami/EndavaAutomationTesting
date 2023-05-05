@@ -11,9 +11,8 @@ public class ProductPage extends BasePage {
         super(driver);
     }
 
-    public ProductPage clickAddToBasketButton() {
+    public void clickAddToBasketButton() {
         driver.findElement(addToBasketButtonLocator).click();
-        return this;
     }
 
     public boolean isViewBasketButtonDisplayed() {
